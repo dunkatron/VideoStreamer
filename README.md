@@ -25,7 +25,7 @@ This tool consists of two parts:
 First, start server.js. Go to the streamer directory and run "node js/server.js". 
 The server is now waiting for files to be dropped into its playlist.
 
-Now, run "node js/client.js add <file_path>". This will add a file to VideoStreamer's playlist and it will begin playing.
+Now, run "node js/client.js add &lt;file_path&gt;". This will add a file to VideoStreamer's playlist and it will begin playing.
 As long as there is something in VideoStreamer's playlist to play, it will play it.
 
 ## Notes
