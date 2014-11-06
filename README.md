@@ -29,4 +29,4 @@ Now, run "node js/client.js add &lt;file_path&gt;". This will add a file to Vide
 As long as there is something in VideoStreamer's playlist to play, it will play it.
 
 ## Notes
-This has only been tested on Mac OSX.
+This has only been tested on OS X.
