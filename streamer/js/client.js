@@ -1,4 +1,3 @@
-///<reference path='../typings/node/node.d.ts' />
 var rpc = require('json-rpc2');
 var config = require('../config.js');
 var client = rpc.Client.$create(config.port, 'localhost');

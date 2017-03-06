@@ -1,6 +1,7 @@
-///<reference path='../typings/node/node.d.ts' />
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var rpc = require('json-rpc2');
-var vc = require('./VideoController');
+var vc = require("./VideoController");
 var fs = require('fs');
 var config = require('../config.js');
 var server = rpc.Server.$create({

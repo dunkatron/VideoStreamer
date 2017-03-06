@@ -3,8 +3,8 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        typescript: {
-            base: {
+        ts: {
+            default: {
                 src: ['src/**/*.ts'],
                 dest: 'js/',
                 options: {
@@ -18,8 +18,8 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-typescript');
+    grunt.loadNpmTasks('grunt-ts');
 
     // Default task(s).
-    grunt.registerTask('default', ['typescript']);
+    grunt.registerTask('default', ['ts']);
 };

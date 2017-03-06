@@ -1,9 +1,9 @@
-///<reference path='../typings/node/node.d.ts' />
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs');
 var uuid = require('node-uuid');
 var config = require('../config.js');
-// Represents the currently running FFMPEG session.
 var FFMPEGCommandWrapper = (function () {
     function FFMPEGCommandWrapper(video) {
         this.video = video;
@@ -11,7 +11,18 @@ var FFMPEGCommandWrapper = (function () {
         if (video.lastPosition) {
             video.initialSeek = video.lastPosition;
         }
-        var command = ffmpeg(video.filename).inputOptions('-re').audioCodec('libfaac').videoCodec('libx264').audioFilters('volume=1.0').videoFilters('scale=-2:' + config.vertical_res).format('flv').addOption('-vb', parseFloat(config.video_bitrate) + 'k').addOption('-minrate', (parseFloat(config.video_bitrate) * 0.8) + 'k').addOption('-bufsize', (parseFloat(config.video_bitrate) * 1.2) + 'k').addOption('-maxrate', (parseFloat(config.video_bitrate) * 1.2) + 'k').output(config.stream_server);
+        var command = ffmpeg(video.filename)
+            .inputOptions('-re')
+            .audioCodec('libfaac')
+            .videoCodec('libx264')
+            .audioFilters('volume=1.0')
+            .videoFilters('scale=-2:' + config.vertical_res)
+            .format('flv')
+            .addOption('-vb', parseFloat(config.video_bitrate) + 'k')
+            .addOption('-minrate', (parseFloat(config.video_bitrate) * 0.8) + 'k')
+            .addOption('-bufsize', (parseFloat(config.video_bitrate) * 1.2) + 'k')
+            .addOption('-maxrate', (parseFloat(config.video_bitrate) * 1.2) + 'k')
+            .output(config.stream_server);
         if (video.initialSeek !== undefined) {
             command.seekInput(video.initialSeek);
         }
@@ -27,8 +38,7 @@ var FFMPEGCommandWrapper = (function () {
         }
     };
     return FFMPEGCommandWrapper;
-})();
-// A video in the playlist including current playback progress
+}());
 var Video = (function () {
     function Video(filename, initialSeek) {
         this.filename = filename;
@@ -36,19 +46,14 @@ var Video = (function () {
         this.id = uuid.v4().replace(/-/g, '');
     }
     return Video;
-})();
+}());
 exports.Video = Video;
-// The class that manages video playback, including wrangling FFMPEG instances,
-// playlist progression, and editing. Ensures that as FFMPEG will always be trying to
-// stream the first item in the playlist, as long as there is one.
 var VideoController = (function () {
     function VideoController(videos) {
         this.currentVideoCommand = null;
         this.videos = videos;
         this.processVideos();
     }
-    // Seek ahead (positive) or back (negative) the given number of seconds in the currently
-    // playing video. Hacky implementation
     VideoController.prototype.seek = function (amount) {
         if (this.videos.length > 0) {
             var video = this.videos.shift();
@@ -61,19 +66,15 @@ var VideoController = (function () {
             return false;
         }
     };
-    // Add the given video to the playlist by filename.
     VideoController.prototype.addVideo = function (videoFilename) {
         var video = new Video(videoFilename, 0);
         this.videos.push(video);
         this.processVideos();
         return video;
     };
-    // Get a copy of the current playlist.
     VideoController.prototype.getVideos = function () {
         return JSON.parse(JSON.stringify(this.videos));
     };
-    // Delete the video with the given video ID prefix from the playlist.
-    // If the currently playing video is specified, playback for that video is ended automatically.
     VideoController.prototype.delVideo = function (videoId) {
         var foundIndex = null;
         for (var i = 0; i < this.videos.length; i++) {
@@ -96,18 +97,12 @@ var VideoController = (function () {
             return null;
         }
     };
-    // Skip the first <n> videos in the playlist.
     VideoController.prototype.skip = function (skipNumber) {
         if (skipNumber > 0) {
             this.videos.splice(0, skipNumber);
             this.processVideos();
         }
     };
-    // Handles starting a video, if necessary. A video will only
-    // be started if one of the following is true
-    // 1. There is no video currently playing but there is at least one video in the playlist
-    // 2. There is a video playing but it doesn't match what is currently the first video in the playlist
-    //      - in this case, the currently playing video is ended and the first video in the playlist begins
     VideoController.prototype.startVideo = function () {
         var video = this.videos[0];
         if (!this.currentVideoCommand && video) {
@@ -153,6 +148,6 @@ var VideoController = (function () {
         this.startVideo();
     };
     return VideoController;
-})();
+}());
 exports.VideoController = VideoController;
 //# sourceMappingURL=VideoController.js.map

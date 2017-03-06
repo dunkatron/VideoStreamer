@@ -12,8 +12,8 @@
     "node-uuid": "^1.4.1"
   },
   "devDependencies": {
-    "grunt-cli": "^0.1.13",
-    "grunt-typescript": "^0.4.1",
-    "tsd": "^0.6.0-beta.3"
+    "grunt": "^1.0.1",
+    "grunt-ts": "^6.0.0-beta.14",
+    "typings": "^2.1.0"
   }
 }
