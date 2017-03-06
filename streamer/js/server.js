@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var rpc = require('json-rpc2');
 var vc = require("./VideoController");
 var fs = require('fs');
 var config = require('../config.js');
-var server = rpc.Server.$create({
-    'websocket': true,
-    'headers': {
-        'Access-Control-Allow-Origin': '*'
-    }
+var RpcServer = require('node-json-rpc2').Server;
+var server = new RpcServer({
+    protocol: 'http',
+    path: '/',
+    port: config.port,
+    method: 'GET'
 });
 var playlistFilename = 'playlist.json';
 var videos;
@@ -32,35 +32,35 @@ var videoController = new vc.VideoController(videos);
 setInterval(function () {
     saveVideos(videoController.getVideos());
 }, 500);
-function list(args, opt, callback) {
+function list(args) {
     var videos = videoController.getVideos();
-    callback(null, videos);
+    return { result: videos };
 }
-function add(args, opt, callback) {
+function add(args) {
     if (args.length > 0) {
         for (var i = 0; i < args.length; i++) {
             videoController.addVideo(args[i]);
         }
-        callback(null, videoController.getVideos());
+        return { result: videoController.getVideos() };
     }
     else {
-        callback(new Error("Add needs a video filename!"), null);
+        return { error: new Error("Add needs a video filename!") };
     }
 }
-function seek(args, opt, callback) {
+function seek(args) {
     if (args[0] === undefined) {
-        callback(new Error("Need amount to seek ahead or behind."));
+        return { error: new Error("Need amount to seek ahead or behind.") };
     }
     else {
         if (videoController.seek(parseFloat(args[0]))) {
-            callback(null, videoController.getVideos());
+            return { result: videoController.getVideos() };
         }
         else {
-            callback(new Error("Seek failed."));
+            return { result: new Error("Seek failed.") };
         }
     }
 }
-function skip(args, opt, callback) {
+function skip(args) {
     var skipNumber;
     if (args[0] === undefined) {
         skipNumber = 1;
@@ -69,23 +69,22 @@ function skip(args, opt, callback) {
         skipNumber = parseInt(args[0]);
     }
     videoController.skip(skipNumber);
-    callback(null, videoController.getVideos());
+    return { result: videoController.getVideos() };
 }
-function del(args, opt, callback) {
+function del(args) {
     var videoId = args[0];
     if (!videoId) {
-        callback(new Error("Del needs a video ID."));
-        return;
+        return { error: new Error("Del needs a video ID.") };
     }
     var deletedVideo = videoController.delVideo(videoId);
     if (deletedVideo) {
-        callback(null, videoController.getVideos());
+        return { result: videoController.getVideos() };
     }
     else {
-        callback(new Error("Unable to delete video with id " + videoId));
+        return { error: new Error("Unable to delete video with id " + videoId) };
     }
 }
-function help(args, opt, callback) {
+function help(args) {
     var returnString = "";
     for (var commandName in functions) {
         var command = functions[commandName];
@@ -97,7 +96,7 @@ function help(args, opt, callback) {
         }
         returnString += "\n\t" + command.helpString + "\n\n";
     }
-    callback(null, returnString);
+    return { result: returnString };
 }
 var functions = {
     list: {
@@ -132,7 +131,16 @@ var functions = {
     }
 };
 for (var k in functions) {
-    server.expose(k, functions[k].command);
+    (function () {
+        var key = k;
+        server.addMethod(key, function exposed(args, id) {
+            var result = functions[key].command(args);
+            return {
+                id: id,
+                result: result.result,
+                error: result.error
+            };
+        });
+    })();
 }
-server.listenHybrid(config.port, 'localhost');
 //# sourceMappingURL=server.js.map
