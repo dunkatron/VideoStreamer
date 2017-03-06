@@ -19,7 +19,7 @@ class FFMPEGCommandWrapper {
 
         var command = ffmpeg(video.filename)
             .inputOptions('-re')
-            .audioCodec('libfaac')
+            .audioCodec('aac')
             .videoCodec('libx264')
             .audioFilters('volume=1.0')
             .videoFilters('scale=-2:' + config.vertical_res)
