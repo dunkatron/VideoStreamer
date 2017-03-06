@@ -14,11 +14,13 @@ var server = rpc.Server.$create({
 
 var playlistFilename = 'playlist.json';
 
-var videos;
+var videos:vc.Video[];
 
 if (fs.existsSync(playlistFilename)) {
     var data = fs.readFileSync(playlistFilename);
     videos = JSON.parse(data);
+} else {
+    videos = [];
 }
 
 var isSaving = false;

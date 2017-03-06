@@ -16,6 +16,9 @@ if (fs.existsSync(playlistFilename)) {
     var data = fs.readFileSync(playlistFilename);
     videos = JSON.parse(data);
 }
+else {
+    videos = [];
+}
 var isSaving = false;
 var saveVideos = function (videos) {
     if (!isSaving) {
