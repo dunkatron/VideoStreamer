@@ -118,6 +118,9 @@ var VideoController = (function () {
             currentVideoCommand.command.on('end', function (end) {
                 finished();
             });
+            currentVideoCommand.command.on('stderr', function (msg) {
+                console.log("STDERR: " + msg);
+            });
             currentVideoCommand.command.on('progress', function (progress) {
                 var timemark = progress.timemark;
                 var splitTimemark = timemark.split(':');
